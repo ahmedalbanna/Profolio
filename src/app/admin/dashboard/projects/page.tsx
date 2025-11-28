@@ -62,9 +62,10 @@ export default function ProjectsPage() {
         setSelectedProject(null);
     }
 
-    // This is a temporary way to handle tags, which are stored as an array of IDs.
-    // In a real app, you'd fetch the tag names from the 'tags' collection.
-    const tagsQuery = useMemoFirebase(() => firestore ? collection(firestore, 'tags') : null, [firestore]);
+    const tagsQuery = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return collection(firestore, `users/${user.uid}/tags`);
+    }, [user, firestore]);
     const { data: allTags } = useCollection(tagsQuery);
 
     const getTagNames = (tagIds: string[]) => {
