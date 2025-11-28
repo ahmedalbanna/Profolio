@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { formatDistanceToNow } from 'date-fns';
+import Link from 'next/link';
 
 import {
   AlertDialog,
@@ -73,7 +74,7 @@ export default function MessagesPage() {
                                     <TableHead className="w-[200px]">Email</TableHead>
                                     <TableHead>Message</TableHead>
                                     <TableHead className="w-[150px]">Received</TableHead>
-                                    <TableHead className="text-right w-[100px]">Actions</TableHead>
+                                    <TableHead className="text-right w-[180px]">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -84,6 +85,9 @@ export default function MessagesPage() {
                                         <TableCell className="text-muted-foreground">{msg.message}</TableCell>
                                         <TableCell>{msg.submissionDate ? `${formatDistanceToNow(msg.submissionDate.toDate())} ago` : 'N/A'}</TableCell>
                                         <TableCell className="text-right">
+                                            <Button variant="outline" size="sm" asChild className="mr-2">
+                                                <Link href={`mailto:${msg.email}`}>Reply</Link>
+                                            </Button>
                                             <Button variant="destructive" size="sm" onClick={() => confirmDelete(msg.id)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
