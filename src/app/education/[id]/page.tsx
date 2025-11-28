@@ -16,11 +16,12 @@ const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export default function EducationDetailsPage({ params }: { params: { id: string } }) {
     const firestore = getFirestore();
+    const { id } = params;
     
     const educationRef = useMemoFirebase(() => {
-        if (!firestore || !params.id) return null;
-        return doc(firestore, `users/${PORTFOLIO_USER_ID}/educations`, params.id);
-    }, [firestore, params.id]);
+        if (!firestore || !id) return null;
+        return doc(firestore, `users/${PORTFOLIO_USER_ID}/educations`, id);
+    }, [firestore, id]);
 
     const { data: education, isLoading } = useDoc<Education>(educationRef);
     

@@ -16,11 +16,12 @@ const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export default function ExperienceDetailsPage({ params }: { params: { id: string } }) {
     const firestore = getFirestore();
+    const { id } = params;
     
     const experienceRef = useMemoFirebase(() => {
-        if (!firestore || !params.id) return null;
-        return doc(firestore, `users/${PORTFOLIO_USER_ID}/experiences`, params.id);
-    }, [firestore, params.id]);
+        if (!firestore || !id) return null;
+        return doc(firestore, `users/${PORTFOLIO_USER_ID}/experiences`, id);
+    }, [firestore, id]);
 
     const { data: experience, isLoading } = useDoc<Experience>(experienceRef);
     

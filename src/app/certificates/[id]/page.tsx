@@ -17,11 +17,12 @@ const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export default function CertificateDetailsPage({ params }: { params: { id: string } }) {
     const firestore = getFirestore();
+    const { id } = params;
     
     const certificateRef = useMemoFirebase(() => {
-        if (!firestore || !params.id) return null;
-        return doc(firestore, `users/${PORTFOLIO_USER_ID}/certificates`, params.id);
-    }, [firestore, params.id]);
+        if (!firestore || !id) return null;
+        return doc(firestore, `users/${PORTFOLIO_USER_ID}/certificates`, id);
+    }, [firestore, id]);
 
     const { data: certificate, isLoading } = useDoc<Certificate>(certificateRef);
     
@@ -113,5 +114,3 @@ export default function CertificateDetailsPage({ params }: { params: { id: strin
         </div>
     )
 }
-
-    

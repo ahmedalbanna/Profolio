@@ -27,11 +27,12 @@ const iconMap: { [key: string]: React.ElementType } = {
 
 export default function SkillDetailsPage({ params }: { params: { id: string } }) {
     const firestore = getFirestore();
+    const { id } = params;
     
     const skillRef = useMemoFirebase(() => {
-        if (!firestore || !params.id) return null;
-        return doc(firestore, `users/${PORTFOLIO_USER_ID}/skills`, params.id);
-    }, [firestore, params.id]);
+        if (!firestore || !id) return null;
+        return doc(firestore, `users/${PORTFOLIO_USER_ID}/skills`, id);
+    }, [firestore, id]);
 
     const { data: skill, isLoading } = useDoc<Skill>(skillRef);
 

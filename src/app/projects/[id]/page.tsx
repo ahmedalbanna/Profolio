@@ -16,14 +16,15 @@ import { useEffect } from 'react';
 
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
     const firestore = useFirestore();
+    const { id } = params;
     
     // Hardcoding the user ID for the public portfolio.
     const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
     const projectRef = useMemoFirebase(() => {
-        if (!firestore || !params.id) return null;
-        return doc(firestore, `users/${PORTFOLIO_USER_ID}/projects`, params.id);
-    }, [firestore, params.id]);
+        if (!firestore || !id) return null;
+        return doc(firestore, `users/${PORTFOLIO_USER_ID}/projects`, id);
+    }, [firestore, id]);
     
     const tagsQuery = useMemoFirebase(() => {
         if(!firestore) return null;
