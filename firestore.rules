@@ -1,0 +1,177 @@
+/**
+ * Core Philosophy: This ruleset enforces a strict user-ownership model for a public portfolio application.
+ * Data for each user is nested under their unique user ID, making it easy to secure. The general principle
+ * is that a user's portfolio data (profile, experience, projects, etc.) is publicly readable by anyone
+ * but can only be written to by the authenticated owner of that data.
+ *
+ * Data Structure: The primary data is organized under the `/users/{userId}` path. Each user document
+ * contains subcollections for their experiences, educations, skills, and projects. This hierarchical
+ * structure aligns with the ownership model. Top-level collections like `/tags` store global, public data,
+ * while `/contactFormSubmissions` is a write-only collection for security.
+ *
+ * Key Security Decisions:
+ * - User Listing Disabled: To protect user privacy, listing the entire `/users` collection is disallowed.
+ *   Individual user profiles can be read directly if the path is known.
+ * - Publicly Readable Portfolios: All data under a `/users/{userId}` path is publicly readable to allow
+ *   for a public-facing portfolio. Write operations are strictly limited to the data owner.
+ * - Read-Only Global Data: The `/tags` collection is treated as global, read-only data for clients.
+ *   It is assumed to be managed administratively (e.g., via the Firebase Console).
+ * - Write-Only Sensitive Data: The `/contactFormSubmissions` collection is write-only. Anyone can create
+ *   a document (submit the form), but no one can read, update, or delete submissions via the client,
+ *   ensuring the privacy of the submitted information.
+ *
+ * Denormalization for Authorization: The rules rely on the `userProfileId` field being denormalized
+ * onto documents within user-specific subcollections (e.g., projects, experiences). This avoids costly
+ * `get()` calls and allows rules to validate that the data being written belongs in the path it's
+ * being written to, ensuring relational integrity.
+ *
+ * Structural Segregation: The data model naturally segregates user data from global and sensitive data
+ * by using separate top-level collections (`/users`, `/tags`, `/contactFormSubmissions`), which leads
+ * to simpler and more secure rules.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions to improve readability and reuse of logic.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    /**
+     * Checks if the request is from an authenticated owner and the document already exists.
+     * CRITICAL for all update and delete operations to prevent modifying non-existent data.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+    /**
+     * Validates that the user is creating data within their own path and that the
+     * internal ownership field (e.g., 'userProfileId') correctly matches their UID.
+     * This enforces relational integrity on creation.
+     */
+    function isCreatingOwnData(userId, ownerField) {
+      return isOwner(userId) && request.resource.data[ownerField] == userId;
+    }
+    /**
+     * Validates that a critical, immutable ownership field is not being changed during an update.
+     */
+    function isOwnerFieldImmutable(ownerField) {
+      return request.resource.data[ownerField] == resource.data[ownerField];
+    }
+
+    /**
+     * @description Manages user profiles. Profiles are publicly readable, but only the owner can create, modify, or delete their own.
+     * @path /users/{userId}
+     * @allow (get) Any user can view a specific profile if they know the user's ID.
+     * @allow (create) An authenticated user can create their own profile document, where {userId} is their UID.
+     * @deny (list) Listing all users is denied to protect user privacy.
+     * @deny (update) A user cannot update another user's profile.
+     * @principle Enforces self-creation and ownership for a user's root document.
+     */
+    match /users/{userId} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('id');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages a user's work experience. Publicly readable, but writable only by the profile owner.
+     * @path /users/{userId}/experiences/{experienceId}
+     * @allow (list) Any user can read the list of experiences for a public profile.
+     * @allow (create) The user {userId} can add a new experience to their own profile.
+     * @deny (create) A user cannot add an experience to another user's profile.
+     * @deny (update) A user cannot change the `userProfileId` field after creation.
+     * @principle Restricts writes to the data owner while allowing public reads for portfolio display.
+     */
+    match /users/{userId}/experiences/{experienceId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isCreatingOwnData(userId, 'userProfileId');
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages a user's education history. Publicly readable, but writable only by the profile owner.
+     * @path /users/{userId}/educations/{educationId}
+     * @allow (list) Any user can read the list of education entries for a public profile.
+     * @allow (create) The user {userId} can add a new education entry to their own profile.
+     * @deny (delete) A user cannot delete an education entry from another user's profile.
+     * @principle Restricts writes to the data owner while allowing public reads for portfolio display.
+     */
+    match /users/{userId}/educations/{educationId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isCreatingOwnData(userId, 'userProfileId');
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages a user's skills. Publicly readable, but writable only by the profile owner.
+     * @path /users/{userId}/skills/{skillId}
+     * @allow (list) Any user can read the list of skills for a public profile.
+     * @allow (create) The user {userId} can add a new skill to their own profile.
+     * @deny (update) A user cannot update a skill on another user's profile.
+     * @principle Restricts writes to the data owner while allowing public reads for portfolio display.
+     */
+    match /users/{userId}/skills/{skillId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isCreatingOwnData(userId, 'userProfileId');
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages a user's projects. Publicly readable, but writable only by the profile owner.
+     * @path /users/{userId}/projects/{projectId}
+     * @allow (list) Any user can read the list of projects for a public profile.
+     * @allow (create) The user {userId} can add a new project to their own profile.
+     * @deny (create) A user cannot create a project with a mismatched `userProfileId`.
+     * @principle Restricts writes to the data owner while allowing public reads for portfolio display.
+     */
+    match /users/{userId}/projects/{projectId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isCreatingOwnData(userId, 'userProfileId');
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Global tags for projects. Publicly readable by all users. This collection is managed administratively and is read-only for clients.
+     * @path /tags/{tagId}
+     * @allow (get, list) Any user, signed in or not, can read tags.
+     * @deny (create, update, delete) All write operations from clients are denied.
+     * @principle Secures global lookup data by making it read-only for clients.
+     */
+    match /tags/{tagId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Allows any user (including unauthenticated) to submit a contact form. Submissions are write-only.
+     * @path /contactFormSubmissions/{submissionId}
+     * @allow (create) Anyone can submit a message through the contact form.
+     * @deny (get, list, update, delete) All other operations are denied to protect the privacy of the submissions.
+     * @principle Enforces a "write-only" pattern for sensitive, user-submitted data.
+     */
+    match /contactFormSubmissions/{submissionId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if true;
+      allow update: if false;
+      allow delete: if false;
+    }
+  }
+}
