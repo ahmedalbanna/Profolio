@@ -5,6 +5,7 @@ import { collection, getFirestore, query, orderBy } from "firebase/firestore";
 import { Briefcase } from "lucide-react";
 import type { Experience } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
 
 // Define a default user ID for the public-facing portfolio.
 const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
@@ -71,17 +72,19 @@ export function ExperienceSection() {
                   <p className="text-muted-foreground text-sm font-medium">{item.startDate} - {item.endDate || 'Present'}</p>
                 </div>
                 <div className={`w-full sm:w-1/2 ${index % 2 === 0 ? 'sm:pl-8' : 'sm:pr-8'}`}>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{item.title}</CardTitle>
-                      <CardDescription>{item.company}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {item.description}
-                      </p>
-                    </CardContent>
-                  </Card>
+                  <Link href={`/experience/${item.id}`} className="block group">
+                    <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                        <CardTitle>{item.title}</CardTitle>
+                        <CardDescription>{item.company}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground line-clamp-3">
+                          {item.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </div>
               </div>
             ))}
