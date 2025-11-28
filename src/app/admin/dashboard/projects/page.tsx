@@ -1,15 +1,20 @@
 'use client';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection } from "firebase/firestore";
+import { collection, doc, deleteDoc } from "firebase/firestore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Image from 'next/image';
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { ProjectForm } from "@/components/admin/ProjectForm";
+import { PlusCircle } from "lucide-react";
 
 export default function ProjectsPage() {
     const { user } = useUser();
     const firestore = useFirestore();
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
 
     const projectsQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -18,8 +23,45 @@ export default function ProjectsPage() {
 
     const { data: projects, isLoading } = useCollection(projectsQuery);
 
+    const handleAdd = () => {
+        setSelectedProject(null);
+        setIsFormOpen(true);
+    };
+
+    const handleEdit = (proj: any) => {
+        setSelectedProject(proj);
+        setIsFormOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!user || !firestore) return;
+        if (confirm("Are you sure you want to delete this project?")) {
+            await deleteDoc(doc(firestore, `users/${user.uid}/projects/${id}`));
+        }
+    };
+    
+    const handleFormClose = () => {
+        setIsFormOpen(false);
+        setSelectedProject(null);
+    }
+
+    // This is a temporary way to handle tags, which are stored as an array of IDs.
+    // In a real app, you'd fetch the tag names from the 'tags' collection.
+    const tagsQuery = useMemoFirebase(() => firestore ? collection(firestore, 'tags') : null, [firestore]);
+    const { data: allTags } = useCollection(tagsQuery);
+
+    const getTagNames = (tagIds: string[]) => {
+        if (!allTags || !tagIds) return [];
+        return tagIds.map(id => allTags.find(t => t.id === id)?.name).filter(Boolean);
+    }
+
     return (
         <div className="animate-in fade-in-0 duration-500">
+            <ProjectForm
+                isOpen={isFormOpen}
+                onClose={handleFormClose}
+                project={selectedProject}
+            />
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
@@ -27,7 +69,10 @@ export default function ProjectsPage() {
                             <CardTitle>Projects</CardTitle>
                             <CardDescription>Manage your portfolio projects.</CardDescription>
                         </div>
-                        <Button>Add Project</Button>
+                        <Button onClick={handleAdd}>
+                            <PlusCircle className="mr-2" />
+                            Add Project
+                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -36,27 +81,27 @@ export default function ProjectsPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Image</TableHead>
+                                    <TableHead className="w-[100px]">Image</TableHead>
                                     <TableHead>Title</TableHead>
                                     <TableHead>Tags</TableHead>
-                                    <TableHead>Actions</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {projects.map((proj) => (
+                                {projects.map((proj: any) => (
                                     <TableRow key={proj.id}>
                                         <TableCell>
                                             <Image src={proj.imageUrl} alt={proj.title} width={80} height={60} className="rounded-md object-cover" />
                                         </TableCell>
-                                        <TableCell>{proj.title}</TableCell>
+                                        <TableCell className="font-medium">{proj.title}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-wrap gap-1">
-                                                {proj.tags.map((tag: string) => <Badge key={tag} variant="secondary">{tag}</Badge>)}
+                                                {getTagNames(proj.tagIds).map((tagName: string) => <Badge key={tagName} variant="secondary">{tagName}</Badge>)}
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            <Button variant="outline" size="sm" className="mr-2">Edit</Button>
-                                            <Button variant="destructive" size="sm">Delete</Button>
+                                        <TableCell className="text-right">
+                                            <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(proj)}>Edit</Button>
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(proj.id)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -64,7 +109,13 @@ export default function ProjectsPage() {
                         </Table>
                     )}
                     {!isLoading && !projects?.length && (
-                         <p className="text-center text-muted-foreground py-8">No projects added yet.</p>
+                        <div className="text-center py-16">
+                            <p className="text-muted-foreground mb-4">No projects added yet.</p>
+                             <Button onClick={handleAdd}>
+                                <PlusCircle className="mr-2" />
+                                Add Your First Project
+                            </Button>
+                        </div>
                     )}
                 </CardContent>
             </Card>

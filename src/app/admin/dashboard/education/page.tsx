@@ -1,13 +1,18 @@
 'use client';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection } from "firebase/firestore";
+import { collection, doc, deleteDoc } from "firebase/firestore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { EducationForm } from "@/components/admin/EducationForm";
+import { PlusCircle } from "lucide-react";
 
 export default function EducationPage() {
     const { user } = useUser();
     const firestore = useFirestore();
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedEducation, setSelectedEducation] = useState(null);
 
     const educationsQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -16,8 +21,35 @@ export default function EducationPage() {
 
     const { data: educations, isLoading } = useCollection(educationsQuery);
 
+    const handleAdd = () => {
+        setSelectedEducation(null);
+        setIsFormOpen(true);
+    };
+
+    const handleEdit = (edu: any) => {
+        setSelectedEducation(edu);
+        setIsFormOpen(true);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!user || !firestore) return;
+        if (confirm("Are you sure you want to delete this education entry?")) {
+            await deleteDoc(doc(firestore, `users/${user.uid}/educations/${id}`));
+        }
+    };
+    
+    const handleFormClose = () => {
+        setIsFormOpen(false);
+        setSelectedEducation(null);
+    }
+
     return (
         <div className="animate-in fade-in-0 duration-500">
+            <EducationForm
+                isOpen={isFormOpen}
+                onClose={handleFormClose}
+                education={selectedEducation}
+            />
             <Card>
                 <CardHeader>
                      <div className="flex justify-between items-center">
@@ -25,7 +57,10 @@ export default function EducationPage() {
                             <CardTitle>Education</CardTitle>
                             <CardDescription>Manage your academic background.</CardDescription>
                         </div>
-                        <Button>Add Education</Button>
+                        <Button onClick={handleAdd}>
+                            <PlusCircle className="mr-2" />
+                            Add Education
+                        </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -37,18 +72,18 @@ export default function EducationPage() {
                                     <TableHead>Institution</TableHead>
                                     <TableHead>Degree</TableHead>
                                     <TableHead>Duration</TableHead>
-                                    <TableHead>Actions</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {educations.map((edu) => (
+                                {educations.map((edu: any) => (
                                     <TableRow key={edu.id}>
-                                        <TableCell>{edu.institution}</TableCell>
+                                        <TableCell className="font-medium">{edu.institution}</TableCell>
                                         <TableCell>{edu.degree}</TableCell>
-                                        <TableCell>{edu.duration}</TableCell>
-                                        <TableCell>
-                                            <Button variant="outline" size="sm" className="mr-2">Edit</Button>
-                                            <Button variant="destructive" size="sm">Delete</Button>
+                                        <TableCell>{edu.startDate} - {edu.endDate || 'Present'}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(edu)}>Edit</Button>
+                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(edu.id)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -56,7 +91,13 @@ export default function EducationPage() {
                         </Table>
                     )}
                     {!isLoading && !educations?.length && (
-                        <p className="text-center text-muted-foreground py-8">No education history added yet.</p>
+                        <div className="text-center py-16">
+                            <p className="text-muted-foreground mb-4">No education history added yet.</p>
+                             <Button onClick={handleAdd}>
+                                <PlusCircle className="mr-2" />
+                                Add Your First Education Entry
+                            </Button>
+                        </div>
                     )}
                 </CardContent>
             </Card>
