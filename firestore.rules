@@ -16,9 +16,7 @@
  *   for a public-facing portfolio. Write operations are strictly limited to the data owner.
  * - Read-Only Global Data: The `/tags` collection is treated as global, read-only data for clients.
  *   It is assumed to be managed administratively (e.g., via the Firebase Console).
- * - Write-Only Sensitive Data: The `/contactFormSubmissions` collection is write-only. Anyone can create
- *   a document (submit the form), but no one can read, update, or delete submissions via the client,
- *   ensuring the privacy of the submitted information.
+ * - Write-Only Sensitive Data: The `/contactFormSubmissions` collection is write-only for the public, but readable by admins.
  *
  * Denormalization for Authorization: The rules rely on the `userProfileId` field being denormalized
  * onto documents within user-specific subcollections (e.g., projects, experiences). This avoids costly
@@ -171,18 +169,17 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows any user (including unauthenticated) to submit a contact form. Submissions are write-only.
+     * @description Allows any user (including unauthenticated) to submit a contact form. Submissions are write-only for the public, but readable/deletable by the admin.
      * @path /contactFormSubmissions/{submissionId}
      * @allow (create) Anyone can submit a message through the contact form.
-     * @deny (get, list, update, delete) All other operations are denied to protect the privacy of the submissions.
-     * @principle Enforces a "write-only" pattern for sensitive, user-submitted data.
+     * @allow (read, delete) Authenticated users (admin) can read and delete messages.
+     * @deny (update) No one can update a submission.
+     * @principle Enforces a "write-only" pattern for sensitive, user-submitted data, with special admin privileges.
      */
     match /contactFormSubmissions/{submissionId} {
-      allow get: if false;
-      allow list: if false;
+      allow read, delete: if isSignedIn();
       allow create: if true;
       allow update: if false;
-      allow delete: if false;
     }
   }
 }

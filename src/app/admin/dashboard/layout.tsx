@@ -12,6 +12,7 @@ import {
   User,
   LogOut,
   Tags,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -101,6 +102,13 @@ export default function DashboardLayout({
                 Dashboard
               </Link>
               <Link
+                href="/admin/dashboard/messages"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Mail className="h-4 w-4" />
+                Messages
+              </Link>
+              <Link
                 href="/admin/dashboard/experience"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
@@ -167,6 +175,13 @@ export default function DashboardLayout({
                 >
                   <LayoutDashboard className="h-5 w-5" />
                   Dashboard
+                </Link>
+                <Link
+                  href="/admin/dashboard/messages"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Mail className="h-5 w-5" />
+                  Messages
                 </Link>
                 <Link
                   href="/admin/dashboard/experience"
