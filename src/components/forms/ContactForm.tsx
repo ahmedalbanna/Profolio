@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFirestore, setDocumentNonBlocking } from "@/firebase";
+import { doc, serverTimestamp } from "firebase/firestore";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -26,6 +29,8 @@ const formSchema = z.object({
 
 export function ContactForm() {
   const { toast } = useToast();
+  const firestore = useFirestore();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,8 +41,26 @@ export function ContactForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real application, you would send this data to a server.
-    console.log(values);
+    if (!firestore) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not send message. Please try again later.",
+      });
+      return;
+    }
+    
+    const submissionId = uuidv4();
+    const docRef = doc(firestore, 'contactFormSubmissions', submissionId);
+    
+    const dataToSave = {
+      ...values,
+      id: submissionId,
+      submissionDate: serverTimestamp(),
+    };
+
+    setDocumentNonBlocking(docRef, dataToSave, {});
+
     form.reset();
     toast({
       title: "Message Sent!",
