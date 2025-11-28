@@ -99,28 +99,28 @@ export default function DashboardLayout({
                 Dashboard
               </Link>
               <Link
-                href="#"
+                href="/admin/dashboard/experience"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
                 <Briefcase className="h-4 w-4" />
                 Experience
               </Link>
               <Link
-                href="#"
+                href="/admin/dashboard/projects"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
                 <Lightbulb className="h-4 w-4" />
                 Projects
               </Link>
               <Link
-                href="#"
+                href="/admin/dashboard/education"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
                 <GraduationCap className="h-4 w-4" />
                 Education
               </Link>
               <Link
-                href="#"
+                href="/admin/dashboard/settings"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
                 <Settings className="h-4 w-4" />
@@ -147,19 +147,46 @@ export default function DashboardLayout({
               <nav className="grid gap-2 text-lg font-medium">
                 <Link
                   href="/admin/dashboard"
-                  className="flex items-center gap-2 text-lg font-semibold"
+                  className="flex items-center gap-2 text-lg font-semibold mb-4"
                 >
                   <LayoutDashboard className="h-6 w-6 text-primary" />
                   <span className="">Profolio Admin</span>
                 </Link>
                 <Link
-                  href="#"
+                  href="/admin/dashboard"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
                 >
                   <LayoutDashboard className="h-5 w-5" />
                   Dashboard
                 </Link>
-                {/* Add other mobile links here */}
+                <Link
+                  href="/admin/dashboard/experience"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Briefcase className="h-5 w-5" />
+                  Experience
+                </Link>
+                <Link
+                  href="/admin/dashboard/projects"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Lightbulb className="h-5 w-5" />
+                  Projects
+                </Link>
+                <Link
+                  href="/admin/dashboard/education"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <GraduationCap className="h-5 w-5" />
+                  Education
+                </Link>
+                <Link
+                  href="/admin/dashboard/settings"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Settings className="h-5 w-5" />
+                  Settings
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
