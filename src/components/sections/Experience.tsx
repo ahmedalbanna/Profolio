@@ -7,7 +7,7 @@ import type { Experience } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
 
 // Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "admin";
+const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export function ExperienceSection() {
     const firestore = getFirestore();

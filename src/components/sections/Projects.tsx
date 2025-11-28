@@ -6,9 +6,10 @@ import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, getFirestore, query } from "firebase/firestore";
 import type { Project, Tag } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
 
 // Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "admin";
+const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export function ProjectsSection() {
     const firestore = getFirestore();
@@ -64,29 +65,31 @@ export function ProjectsSection() {
             ))
            }
           {projects?.map((project) => (
-            <Card key={project.id} className="overflow-hidden group hover:shadow-xl transition-shadow">
-              <CardContent className="p-0">
-                <div className="relative h-60 w-full">
-                  <Image
-                    src={project.imageUrl}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-6">
-                  <CardTitle className="mb-2">{project.title}</CardTitle>
-                  <CardDescription className="mb-4">{project.description}</CardDescription>
-                  <div className="flex flex-wrap gap-2">
-                    {getTagNames(project.tagIds).map((tag) => (
-                      <Badge key={tag} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <Link key={project.id} href={`/projects/${project.id}`} className="group">
+                <Card className="overflow-hidden h-full group-hover:shadow-xl transition-shadow">
+                <CardContent className="p-0">
+                    <div className="relative h-60 w-full">
+                    <Image
+                        src={project.imageUrl}
+                        alt={project.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    </div>
+                    <div className="p-6">
+                    <CardTitle className="mb-2">{project.title}</CardTitle>
+                    <CardDescription className="mb-4 line-clamp-2">{project.description}</CardDescription>
+                    <div className="flex flex-wrap gap-2">
+                        {getTagNames(project.tagIds).map((tag) => (
+                        <Badge key={tag} variant="secondary">
+                            {tag}
+                        </Badge>
+                        ))}
+                    </div>
+                    </div>
+                </CardContent>
+                </Card>
+            </Link>
           ))}
            {!isLoading && !projects?.length && (
                 <p className="text-center text-muted-foreground col-span-full">No projects have been added yet.</p>

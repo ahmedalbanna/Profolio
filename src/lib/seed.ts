@@ -9,8 +9,8 @@ import { firebaseConfig } from '../firebase/config';
 import { SEED_DATA } from './seed-data';
 
 // --- Configuration ---
-const ADMIN_EMAIL = 'admin@example.com';
-const ADMIN_PASSWORD = 'password';
+const ADMIN_EMAIL = 'ahmedalbanna966@gmail.com';
+const ADMIN_PASSWORD = 'Ahmed@2025';
 
 async function seedDatabase() {
     console.log("--- Starting Firebase Seed Script ---");

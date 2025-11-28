@@ -154,7 +154,7 @@ service cloud.firestore {
     match /tags/{tagId} {
       allow get: if true;
       allow list: if true;
-      allow create: if false;
+      allow create: if true;
       allow update: if false;
       allow delete: if false;
     }

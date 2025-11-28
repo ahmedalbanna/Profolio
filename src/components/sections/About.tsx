@@ -4,7 +4,7 @@ import { doc, getFirestore } from "firebase/firestore";
 import { Skeleton } from "../ui/skeleton";
 
 // Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "admin";
+const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export function AboutSection() {
     const firestore = getFirestore();

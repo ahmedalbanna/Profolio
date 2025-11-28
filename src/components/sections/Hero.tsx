@@ -8,7 +8,7 @@ import { Skeleton } from "../ui/skeleton";
 
 // Define a default user ID for the public-facing portfolio.
 // In a multi-user scenario, this would be dynamic.
-const PORTFOLIO_USER_ID = "admin";
+const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export function HeroSection() {
   const firestore = getFirestore();
