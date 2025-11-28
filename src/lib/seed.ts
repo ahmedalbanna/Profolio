@@ -75,6 +75,13 @@ async function seedDatabase() {
             batch.set(skillRef, { ...skill, id: skillId, userProfileId: user.uid });
         });
 
+        // Seed Certificates
+        SEED_DATA.certificates.forEach(cert => {
+            const certId = uuidv4();
+            const certRef = doc(firestore, `users/${user.uid}/certificates/${certId}`);
+            batch.set(certRef, { ...cert, id: certId, userProfileId: user.uid });
+        });
+
         console.log("Data batch is ready. Committing to Firestore...");
 
         // 4. Commit the batch
@@ -99,3 +106,5 @@ async function seedDatabase() {
 
 // Run the seed function
 seedDatabase();
+
+    

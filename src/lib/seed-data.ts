@@ -122,5 +122,23 @@ export const SEED_DATA = {
             level: 3,
             description: "Familiar with the fundamentals of machine learning, including model training and evaluation using frameworks like TensorFlow. Experience in deploying models as part of a larger application."
         },
+    ],
+    certificates: [
+        {
+            name: "Google Cloud Certified - Professional Cloud Architect",
+            issuingOrganization: "Google Cloud",
+            issueDate: "2023-05",
+            credentialUrl: "https://example.com",
+            imageUrl: "https://picsum.photos/seed/cert1/600/400",
+        },
+        {
+            name: "Certified Kubernetes Administrator (CKA)",
+            issuingOrganization: "The Linux Foundation",
+            issueDate: "2022-11",
+            credentialUrl: "https://example.com",
+            imageUrl: "https://picsum.photos/seed/cert2/600/400",
+        },
     ]
 };
+
+    

@@ -13,6 +13,7 @@ import {
   LogOut,
   Tags,
   Mail,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -136,6 +137,13 @@ export default function DashboardLayout({
                 <GraduationCap className="h-4 w-4" />
                 Education
               </Link>
+               <Link
+                href="/admin/dashboard/certificates"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Award className="h-4 w-4" />
+                Certificates
+              </Link>
               <Link
                 href="/admin/dashboard/settings"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
@@ -211,6 +219,13 @@ export default function DashboardLayout({
                   <GraduationCap className="h-5 w-5" />
                   Education
                 </Link>
+                 <Link
+                  href="/admin/dashboard/certificates"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Award className="h-5 w-5" />
+                  Certificates
+                </Link>
                 <Link
                   href="/admin/dashboard/settings"
                   className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
@@ -255,3 +270,5 @@ export default function DashboardLayout({
     </div>
   );
 }
+
+    

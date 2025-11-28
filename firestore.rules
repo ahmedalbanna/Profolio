@@ -121,6 +121,21 @@ service cloud.firestore {
     }
 
     /**
+     * @description Manages a user's certificates. Publicly readable, but writable only by the profile owner.
+     * @path /users/{userId}/certificates/{certificateId}
+     * @allow (list, get) Any user can read the certificate entries for a public profile.
+     * @allow (create) The user {userId} can add a new certificate entry to their own profile.
+     * @principle Restricts writes to the data owner while allowing public reads for portfolio display.
+     */
+    match /users/{userId}/certificates/{certificateId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if isCreatingOwnData(userId, 'userProfileId');
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
      * @description Manages a user's skills. Publicly readable, but writable only by the profile owner.
      * @path /users/{userId}/skills/{skillId}
      * @allow (list) Any user can read the list of skills for a public profile.
@@ -183,3 +198,5 @@ service cloud.firestore {
     }
   }
 }
+
+    

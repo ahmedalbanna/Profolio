@@ -58,3 +58,15 @@ export interface UserProfile {
     githubUrl?: string;
     professionalTitle?: string;
 }
+
+export interface Certificate {
+  id: string;
+  userProfileId: string;
+  name: string;
+  issuingOrganization: string;
+  issueDate: string;
+  credentialUrl?: string;
+  imageUrl?: string;
+}
+
+    
