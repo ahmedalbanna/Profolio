@@ -200,6 +200,28 @@
           "items": {
             "type": "string"
           }
+        },
+        "views": {
+            "type": "number",
+            "description": "The number of views the project has received."
+        },
+        "gallery": {
+            "type": "array",
+            "description": "A gallery of images or videos for the project.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["image", "video"]
+                    }
+                },
+                "required": ["url", "type"]
+            }
         }
       },
       "required": [

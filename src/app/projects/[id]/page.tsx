@@ -5,12 +5,13 @@ import { doc, getFirestore, collection } from 'firebase/firestore';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Eye, Film, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import type { Project, Tag } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
     const firestore = getFirestore();
@@ -36,6 +37,24 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
     const getTagNames = (tagIds: string[]) => {
         if (!allTags || !tagIds) return [];
         return tagIds.map(id => allTags.find(t => t.id === id)?.name).filter(Boolean) as string[];
+    }
+    
+    const renderGalleryItem = (item: { url: string; type: 'image' | 'video' }) => {
+        if (item.type === 'video') {
+            return (
+                <div className="relative aspect-video w-full h-full flex items-center justify-center bg-black rounded-lg">
+                    <video controls src={item.url} className="max-h-full max-w-full rounded-lg" />
+                </div>
+            )
+        }
+        return (
+            <Image
+                src={item.url}
+                alt={project?.title || 'Project image'}
+                fill
+                className="rounded-lg object-cover"
+            />
+        )
     }
 
     if (isLoading) {
@@ -90,6 +109,11 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
         )
     }
 
+    const gallery = [
+        { url: project.imageUrl, type: 'image' },
+        ...(project.gallery || [])
+    ];
+
     return (
         <div className="flex flex-col min-h-screen">
             <Header />
@@ -104,16 +128,31 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
                         </Button>
                     </div>
                     <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-start">
-                        <div className="relative aspect-video">
-                             <Image
-                                src={project.imageUrl}
-                                alt={project.title}
-                                fill
-                                className="rounded-lg object-cover shadow-lg"
-                             />
+                        <div>
+                             <Carousel className="w-full shadow-lg rounded-lg">
+                                <CarouselContent>
+                                    {gallery.map((item, index) => (
+                                    <CarouselItem key={index} className="relative aspect-video">
+                                        {renderGalleryItem(item)}
+                                    </CarouselItem>
+                                    ))}
+                                </CarouselContent>
+                                {gallery.length > 1 && (
+                                    <>
+                                        <CarouselPrevious className="left-2" />
+                                        <CarouselNext className="right-2" />
+                                    </>
+                                )}
+                            </Carousel>
                         </div>
                         <div className="space-y-6">
                              <h1 className="text-3xl font-bold tracking-tight text-primary sm:text-4xl">{project.title}</h1>
+                             <div className="flex items-center gap-4 text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                    <Eye className="h-5 w-5" />
+                                    <span>{project.views?.toLocaleString() || 'N/A'} views</span>
+                                </div>
+                             </div>
                              <p className="text-lg text-muted-foreground leading-relaxed">
                                 {project.description}
                              </p>

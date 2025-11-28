@@ -12,31 +12,44 @@ export const SEED_DATA = {
     projects: [
       {
         title: "QuantumLeap Analytics",
-        description: "A comprehensive data analytics dashboard that provides real-time insights and visualizations for business intelligence.",
+        description: "A comprehensive data analytics dashboard that provides real-time insights and visualizations for business intelligence. It features a fully interactive map, customizable charts, and a powerful data filtering system, all built with D3.js and React.",
         tags: ["React", "TypeScript", "D3.js", "Node.js"],
         imageUrl: "https://picsum.photos/seed/p1/600/400",
         projectUrl: "https://example.com",
+        views: 12543,
+        gallery: [
+            { url: "https://picsum.photos/seed/g1-1/800/600", type: 'image' },
+            { url: "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", type: 'video' },
+            { url: "https://picsum.photos/seed/g1-2/800/600", type: 'image' },
+        ]
       },
       {
         title: "ConnectSphere Mobile",
-        description: "A cross-platform social networking app designed for professionals to connect and collaborate on projects.",
+        description: "A cross-platform social networking app designed for professionals to connect and collaborate on projects. It includes real-time chat, project management boards, and a skill-based user search.",
         tags: ["React Native", "Firebase", "GraphQL"],
         imageUrl: "https://picsum.photos/seed/p2/600/400",
         projectUrl: "https://example.com",
+        views: 8902
       },
       {
         title: "Orion Branding Site",
-        description: "A sleek, modern, and fully responsive marketing website for a creative agency, featuring GSAP animations.",
+        description: "A sleek, modern, and fully responsive marketing website for a creative agency, featuring stunning animations and transitions powered by GSAP. The site is built with Next.js for optimal performance and SEO.",
         tags: ["Next.js", "Tailwind CSS", "GSAP"],
         imageUrl: "https://picsum.photos/seed/p3/600/400",
         projectUrl: "https://example.com",
+        views: 21089,
+        gallery: [
+            { url: "https://picsum.photos/seed/g2-1/800/600", type: 'image' },
+            { url: "https://picsum.photos/seed/g2-2/800/600", type: 'image' },
+        ]
       },
       {
         title: "Project Minerva",
-        description: "A machine learning pipeline for sentiment analysis of customer feedback, deployed on AWS.",
+        description: "A machine learning pipeline for sentiment analysis of customer feedback, deployed as a serverless function on AWS Lambda. The model is built with TensorFlow and achieves 95% accuracy.",
         tags: ["Python", "TensorFlow", "AWS Lambda"],
         imageUrl: "https://picsum.photos/seed/p4/600/400",
         projectUrl: "https://example.com",
+        views: 5400
       },
     ],
     experiences: [

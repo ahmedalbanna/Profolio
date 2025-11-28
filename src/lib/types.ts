@@ -36,6 +36,11 @@ export interface Project {
   imageUrl: string;
   projectUrl?: string;
   tagIds: string[];
+  views?: number;
+  gallery?: {
+    url: string;
+    type: 'image' | 'video';
+  }[];
 }
 
 export interface Tag {
