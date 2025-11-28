@@ -50,6 +50,12 @@ export default function AdminLoginPage() {
           </p>
         </div>
         <LoginForm />
+        <div className="text-center text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link href="/admin/register" className="font-semibold text-primary hover:underline">
+            Register
+          </Link>
+        </div>
         <div className="text-center text-sm">
           <Link href="/" className="text-muted-foreground hover:text-primary">
             &larr; Back to Default Portfolio

@@ -20,7 +20,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/firebase";
 import {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { useState } from "react";
@@ -50,26 +49,9 @@ export function LoginForm() {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
     } catch (signInError) {
-      if (
-        signInError instanceof FirebaseError &&
-        signInError.code === "auth/user-not-found"
-      ) {
-        try {
-          await createUserWithEmailAndPassword(
-            auth,
-            values.email,
-            values.password
-          );
-        } catch (signUpError) {
-          if (signUpError instanceof FirebaseError) {
-            setErrorMessage(signUpError.message);
-          } else {
-            setErrorMessage("An unexpected error occurred during sign-up.");
-          }
-        }
-      } else if (signInError instanceof FirebaseError) {
-        if (signInError.code === 'auth/invalid-credential') {
-             setErrorMessage("Incorrect password. Please try again.");
+      if (signInError instanceof FirebaseError) {
+        if (signInError.code === 'auth/invalid-credential' || signInError.code === 'auth/user-not-found') {
+             setErrorMessage("Invalid email or password. Please try again.");
         } else {
             setErrorMessage(signInError.message);
         }
