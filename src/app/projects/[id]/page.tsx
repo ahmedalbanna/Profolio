@@ -1,7 +1,7 @@
 'use client';
 
-import { useDoc, useMemoFirebase, useCollection } from '@/firebase';
-import { doc, getFirestore, collection } from 'firebase/firestore';
+import { useDoc, useMemoFirebase, useCollection, useFirestore } from '@/firebase';
+import { doc, getFirestore, collection, updateDoc, increment } from 'firebase/firestore';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,9 +12,10 @@ import { Footer } from '@/components/layout/Footer';
 import type { Project, Tag } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { useEffect } from 'react';
 
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
-    const firestore = getFirestore();
+    const firestore = useFirestore();
     
     // Hardcoding the user ID for the public portfolio.
     const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
@@ -33,6 +34,14 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
     const { data: allTags, isLoading: isLoadingTags } = useCollection<Tag>(tagsQuery);
     
     const isLoading = isLoadingProject || isLoadingTags;
+    
+    useEffect(() => {
+        if (projectRef && process.env.NODE_ENV === 'production') {
+            updateDoc(projectRef, {
+                views: increment(1)
+            }).catch(console.error);
+        }
+    }, [projectRef]);
 
     const getTagNames = (tagIds: string[]) => {
         if (!allTags || !tagIds) return [];
@@ -150,7 +159,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
                              <div className="flex items-center gap-4 text-muted-foreground">
                                 <div className="flex items-center gap-2">
                                     <Eye className="h-5 w-5" />
-                                    <span>{project.views?.toLocaleString() || 'N/A'} views</span>
+                                    <span>{project.views?.toLocaleString() || '0'} views</span>
                                 </div>
                              </div>
                              <p className="text-lg text-muted-foreground leading-relaxed">

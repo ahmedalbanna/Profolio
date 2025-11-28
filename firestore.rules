@@ -61,6 +61,15 @@ service cloud.firestore {
     function isOwnerFieldImmutable(ownerField) {
       return request.resource.data[ownerField] == resource.data[ownerField];
     }
+    
+    /**
+     * @description Analytics data. Anyone can write, but no one can read.
+     * This allows for basic, anonymous analytics tracking without exposing data.
+     */
+    match /visits/{visitId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
 
     /**
      * @description Manages user profiles. Profiles are publicly readable, but only the owner can create, modify, or delete their own.
@@ -140,7 +149,8 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
       allow create: if isCreatingOwnData(userId, 'userProfileId');
-      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      // Anyone can update the views count
+      allow update: if (isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId')) || (request.resource.data.keys().hasOnly(['views']));
       allow delete: if isExistingOwner(userId);
     }
 

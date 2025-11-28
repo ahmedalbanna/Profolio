@@ -3,17 +3,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
-
-// This is mock data. In a real application, you would fetch this from your analytics service.
-const chartData = [
-  { date: '2024-05-20', visitors: 12 },
-  { date: '2024-05-21', visitors: 18 },
-  { date: '2024-05-22', visitors: 15 },
-  { date: '2024-05-23', visitors: 25 },
-  { date: '2024-05-24', visitors: 22 },
-  { date: '2024-05-25', visitors: 30 },
-  { date: '2024-05-26', visitors: 28 },
-];
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, where, Timestamp } from 'firebase/firestore';
+import { subDays, format, eachDayOfInterval } from 'date-fns';
+import { useMemo } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const chartConfig = {
   visitors: {
@@ -23,6 +17,56 @@ const chartConfig = {
 };
 
 export function VisitorsChart() {
+    const firestore = useFirestore();
+    const sevenDaysAgo = subDays(new Date(), 7);
+
+    const visitorsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(
+            collection(firestore, 'visits'),
+            where('timestamp', '>=', Timestamp.fromDate(sevenDaysAgo))
+        );
+    }, [firestore]);
+
+    const { data: visits, isLoading } = useCollection(visitorsQuery);
+
+    const chartData = useMemo(() => {
+        if (!visits) return [];
+        
+        const interval = eachDayOfInterval({ start: sevenDaysAgo, end: new Date() });
+        const dailyCounts = new Map<string, number>();
+        interval.forEach(day => {
+            dailyCounts.set(format(day, 'yyyy-MM-dd'), 0);
+        });
+
+        visits.forEach(visit => {
+            const date = format(visit.timestamp.toDate(), 'yyyy-MM-dd');
+            if (dailyCounts.has(date)) {
+                dailyCounts.set(date, (dailyCounts.get(date) || 0) + 1);
+            }
+        });
+
+        return Array.from(dailyCounts.entries()).map(([date, visitors]) => ({
+            date,
+            visitors
+        })).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    }, [visits]);
+
+    if(isLoading) {
+        return (
+             <Card>
+                <CardHeader>
+                    <Skeleton className="h-7 w-48" />
+                    <Skeleton className="h-4 w-32" />
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-[200px] w-full" />
+                </CardContent>
+            </Card>
+        )
+    }
+
   return (
     <Card>
       <CardHeader>
