@@ -1,10 +1,9 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormStatus } from "react-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { authenticate } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { useAuth } from "@/firebase";
+import { initiateEmailSignIn } from "@/firebase/non-blocking-login";
+import { useState } from "react";
+import { FirebaseError } from "firebase/app";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -26,19 +29,32 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
-  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
-
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const auth = useAuth();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "admin@example.com",
+      password: "password",
     },
   });
 
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      initiateEmailSignIn(auth, values.email, values.password);
+    } catch (error) {
+       if (error instanceof FirebaseError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
+    }
+  }
+
   return (
     <Form {...form}>
-      <form action={dispatch} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <Card>
           <CardContent className="p-6 space-y-4">
             <FormField

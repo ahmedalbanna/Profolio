@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, UserCircle } from "lucide-react";
+import { Menu, UserCircle, LayoutDashboard } from "lucide-react";
 import React from "react";
+import { useUser } from "@/firebase";
 
 const navLinks = [
   { href: "#about", label: "About" },
@@ -15,6 +16,7 @@ const navLinks = [
 
 export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const { user } = useUser();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -49,9 +51,13 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link href="/admin">
-              <UserCircle className="mr-2 h-4 w-4" />
-              Admin Panel
+            <Link href={user ? "/admin/dashboard" : "/admin"}>
+              {user ? (
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+              ) : (
+                <UserCircle className="mr-2 h-4 w-4" />
+              )}
+              {user ? "Dashboard" : "Admin Panel"}
             </Link>
           </Button>
           <Sheet>

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Briefcase,
@@ -8,6 +10,7 @@ import {
   PanelLeft,
   Settings,
   User,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,12 +22,63 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth, useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push("/admin");
+    }
+  }, [user, isUserLoading, router]);
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
+  
+  if (isUserLoading || !user) {
+    return (
+       <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+        <div className="hidden border-r bg-muted/40 md:block">
+          <div className="flex h-full max-h-screen flex-col gap-2">
+            <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+              <Skeleton className="h-8 w-32" />
+            </div>
+            <div className="flex-1 p-4 space-y-4">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+            <Skeleton className="h-8 w-8 md:hidden" />
+            <div className="w-full flex-1">
+              <Skeleton className="h-8 w-24" />
+            </div>
+            <Skeleton className="h-8 w-24" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </header>
+          <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+             <Skeleton className="h-96 w-full" />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -129,7 +183,10 @@ export default function DashboardLayout({
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
