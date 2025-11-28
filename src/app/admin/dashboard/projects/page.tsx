@@ -9,12 +9,24 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { ProjectForm } from "@/components/admin/ProjectForm";
 import { PlusCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function ProjectsPage() {
     const { user } = useUser();
     const firestore = useFirestore();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedProject, setSelectedProject] = useState(null);
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
     const projectsQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -33,11 +45,16 @@ export default function ProjectsPage() {
         setIsFormOpen(true);
     };
 
-    const handleDelete = async (id: string) => {
-        if (!user || !firestore) return;
-        if (confirm("Are you sure you want to delete this project?")) {
-            await deleteDoc(doc(firestore, `users/${user.uid}/projects/${id}`));
-        }
+    const confirmDelete = (id: string) => {
+        setItemToDelete(id);
+        setIsAlertOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!user || !firestore || !itemToDelete) return;
+        await deleteDoc(doc(firestore, `users/${user.uid}/projects/${itemToDelete}`));
+        setIsAlertOpen(false);
+        setItemToDelete(null);
     };
     
     const handleFormClose = () => {
@@ -62,6 +79,20 @@ export default function ProjectsPage() {
                 onClose={handleFormClose}
                 project={selectedProject}
             />
+             <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this project.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
@@ -101,7 +132,7 @@ export default function ProjectsPage() {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(proj)}>Edit</Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(proj.id)}>Delete</Button>
+                                            <Button variant="destructive" size="sm" onClick={() => confirmDelete(proj.id)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}

@@ -1,18 +1,30 @@
 'use client';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, deleteDoc, setDoc } from "firebase/firestore";
+import { collection, doc, deleteDoc } from "firebase/firestore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { ExperienceForm } from "@/components/admin/ExperienceForm";
 import { PlusCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export default function ExperiencePage() {
     const { user } = useUser();
     const firestore = useFirestore();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedExperience, setSelectedExperience] = useState(null);
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
     const experiencesQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
@@ -31,11 +43,16 @@ export default function ExperiencePage() {
         setIsFormOpen(true);
     };
 
-    const handleDelete = async (id: string) => {
-        if (!user || !firestore) return;
-        if (confirm("Are you sure you want to delete this experience?")) {
-            await deleteDoc(doc(firestore, `users/${user.uid}/experiences/${id}`));
-        }
+    const confirmDelete = (id: string) => {
+        setItemToDelete(id);
+        setIsAlertOpen(true);
+    };
+
+    const handleDelete = async () => {
+        if (!user || !firestore || !itemToDelete) return;
+        await deleteDoc(doc(firestore, `users/${user.uid}/experiences/${itemToDelete}`));
+        setIsAlertOpen(false);
+        setItemToDelete(null);
     };
     
     const handleFormClose = () => {
@@ -50,6 +67,20 @@ export default function ExperiencePage() {
                 onClose={handleFormClose}
                 experience={selectedExperience}
             />
+            <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this experience entry.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <Card>
                 <CardHeader>
                     <div className="flex justify-between items-center">
@@ -83,7 +114,7 @@ export default function ExperiencePage() {
                                         <TableCell>{exp.startDate} - {exp.endDate || 'Present'}</TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="outline" size="sm" className="mr-2" onClick={() => handleEdit(exp)}>Edit</Button>
-                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(exp.id)}>Delete</Button>
+                                            <Button variant="destructive" size="sm" onClick={() => confirmDelete(exp.id)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
