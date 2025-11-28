@@ -23,8 +23,7 @@ export function Header() {
   const pathname = usePathname();
   
   const userId = params.userId as string;
-  const isPortfolioPage = !!userId;
-  const isLandingPage = pathname === '/';
+  const isPortfolioPage = !!userId || !pathname.startsWith('/admin');
 
 
   React.useEffect(() => {
@@ -37,7 +36,7 @@ export function Header() {
     };
   }, []);
 
-  const portfolioHomeLink = isPortfolioPage ? `/${userId}` : '/';
+  const portfolioHomeLink = userId ? `/${userId}` : '/';
 
   return (
     <header
@@ -46,7 +45,7 @@ export function Header() {
       }`}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={portfolioHomeLink} className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">Profolio</span>
         </Link>
         
@@ -65,16 +64,14 @@ export function Header() {
         )}
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={user ? "/admin/dashboard" : "/admin"}>
-              {user ? (
-                <LayoutDashboard className="mr-2 h-4 w-4" />
-              ) : (
-                <UserCircle className="mr-2 h-4 w-4" />
-              )}
-              {user ? "Dashboard" : "Admin Panel"}
-            </Link>
-          </Button>
+          {user && (
+             <Button asChild variant="outline" size="sm">
+                <Link href="/admin/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                </Link>
+             </Button>
+          )}
 
           {isPortfolioPage && (
             <Sheet>

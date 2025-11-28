@@ -8,10 +8,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useParams } from 'next/navigation';
 
+const DEFAULT_PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+
 export function CertificatesSection() {
     const firestore = getFirestore();
     const params = useParams();
-    const userId = params.userId as string;
+    const userId = params.userId as string || DEFAULT_PORTFOLIO_USER_ID;
 
     const certificatesQuery = useMemoFirebase(() => {
         if (!firestore || !userId) return null;
@@ -22,6 +24,10 @@ export function CertificatesSection() {
     }, [firestore, userId]);
 
     const { data: certificates, isLoading } = useCollection<Certificate>(certificatesQuery);
+
+    const linkHref = (itemId: string) => {
+        return params.userId ? `/${params.userId}/certificates/${itemId}` : `/certificates/${itemId}`;
+    }
 
   return (
     <section id="certificates" className="py-24 sm:py-32 bg-card">
@@ -49,7 +55,7 @@ export function CertificatesSection() {
                </Card>
           ))}
           {certificates?.map((cert) => (
-            <Link key={cert.id} href={`/${userId}/certificates/${cert.id}`} className="group">
+            <Link key={cert.id} href={linkHref(cert.id)} className="group">
               <Card className="flex flex-col h-full overflow-hidden group-hover:shadow-lg transition-shadow">
                 {cert.imageUrl && (
                     <div className="relative h-48 w-full">

@@ -8,6 +8,8 @@ import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { useParams } from 'next/navigation';
 
+const DEFAULT_PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+
 const iconMap: { [key: string]: React.ElementType } = {
   Frontend: Code,
   Backend: Server,
@@ -21,7 +23,7 @@ const iconMap: { [key: string]: React.ElementType } = {
 export function SkillsSection() {
     const firestore = getFirestore();
     const params = useParams();
-    const userId = params.userId as string;
+    const userId = params.userId as string || DEFAULT_PORTFOLIO_USER_ID;
 
     const skillsQuery = useMemoFirebase(() => {
         if (!firestore || !userId) return null;
@@ -29,6 +31,10 @@ export function SkillsSection() {
     }, [firestore, userId]);
 
     const { data: skills, isLoading } = useCollection<Skill>(skillsQuery);
+
+    const linkHref = (itemId: string) => {
+        return params.userId ? `/${params.userId}/skills/${itemId}` : `/skills/${itemId}`;
+    }
 
     return (
         <section id="skills" className="py-24 sm:py-32">
@@ -54,7 +60,7 @@ export function SkillsSection() {
             {skills?.map((skill) => {
                 const Icon = iconMap[skill.name] || iconMap.Default;
                 return (
-                    <Link key={skill.id} href={`/${userId}/skills/${skill.id}`} className="group">
+                    <Link key={skill.id} href={linkHref(skill.id)} className="group">
                         <Card className="flex flex-col items-center justify-center p-6 text-center h-full hover:shadow-lg transition-shadow">
                         <CardContent className="p-0 flex flex-col items-center">
                             <Icon className="h-12 w-12 text-primary mb-4 transition-transform group-hover:scale-110" />

@@ -11,10 +11,12 @@ import { useState, useMemo } from "react";
 import { Input } from "../ui/input";
 import { useParams } from 'next/navigation';
 
+const DEFAULT_PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+
 export function ProjectsSection() {
     const firestore = getFirestore();
     const params = useParams();
-    const userId = params.userId as string;
+    const userId = params.userId as string || DEFAULT_PORTFOLIO_USER_ID;
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -60,6 +62,9 @@ export function ProjectsSection() {
         });
     }, [projects, searchQuery, selectedTags]);
 
+    const linkHref = (itemId: string) => {
+        return params.userId ? `/${params.userId}/projects/${itemId}` : `/projects/${itemId}`;
+    }
 
   return (
     <section id="projects" className="py-24 sm:py-32 bg-card">
@@ -119,7 +124,7 @@ export function ProjectsSection() {
             ))
            }
           {!isLoading && filteredProjects.map((project) => (
-            <Link key={project.id} href={`/${userId}/projects/${project.id}`} className="group">
+            <Link key={project.id} href={linkHref(project.id)} className="group">
                 <Card className="overflow-hidden h-full group-hover:shadow-xl transition-shadow">
                 <CardContent className="p-0">
                     <div className="relative h-60 w-full">

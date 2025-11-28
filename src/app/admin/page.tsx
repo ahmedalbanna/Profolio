@@ -58,7 +58,7 @@ export default function AdminLoginPage() {
         </div>
         <div className="text-center text-sm">
           <Link href="/" className="text-muted-foreground hover:text-primary">
-            &larr; Back to Default Portfolio
+            &larr; Back to Home
           </Link>
         </div>
       </div>

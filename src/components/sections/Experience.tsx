@@ -8,10 +8,12 @@ import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { useParams } from 'next/navigation';
 
+const DEFAULT_PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+
 export function ExperienceSection() {
     const firestore = getFirestore();
     const params = useParams();
-    const userId = params.userId as string;
+    const userId = params.userId as string || DEFAULT_PORTFOLIO_USER_ID;
 
     const experiencesQuery = useMemoFirebase(() => {
         if (!firestore || !userId) return null;
@@ -22,6 +24,11 @@ export function ExperienceSection() {
     }, [firestore, userId]);
 
     const { data: experiences, isLoading } = useCollection<Experience>(experiencesQuery);
+    
+    const linkHref = (itemId: string) => {
+        return params.userId ? `/${params.userId}/experience/${itemId}` : `/experience/${itemId}`;
+    }
+
   return (
     <section id="experience" className="py-24 sm:py-32">
       <div className="container mx-auto px-4 md:px-6">
@@ -73,7 +80,7 @@ export function ExperienceSection() {
                   <p className="text-muted-foreground text-sm font-medium">{item.startDate} - {item.endDate || 'Present'}</p>
                 </div>
                 <div className={`w-full sm:w-1/2 ${index % 2 === 0 ? 'sm:pl-8' : 'sm:pr-8'}`}>
-                  <Link href={`/${userId}/experience/${item.id}`} className="block group">
+                  <Link href={linkHref(item.id)} className="block group">
                     <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
                         <CardTitle>{item.title}</CardTitle>

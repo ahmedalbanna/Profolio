@@ -8,10 +8,12 @@ import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { useParams } from 'next/navigation';
 
+const DEFAULT_PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+
 export function EducationSection() {
     const firestore = getFirestore();
     const params = useParams();
-    const userId = params.userId as string;
+    const userId = params.userId as string || DEFAULT_PORTFOLIO_USER_ID;
 
     const educationsQuery = useMemoFirebase(() => {
         if (!firestore || !userId) return null;
@@ -22,6 +24,10 @@ export function EducationSection() {
     }, [firestore, userId]);
 
     const { data: educations, isLoading } = useCollection<Education>(educationsQuery);
+
+    const linkHref = (itemId: string) => {
+        return params.userId ? `/${params.userId}/education/${itemId}` : `/education/${itemId}`;
+    }
 
   return (
     <section id="education" className="py-24 sm:py-32">
@@ -49,7 +55,7 @@ export function EducationSection() {
               </Card>
           ))}
           {educations?.map((edu) => (
-            <Link key={edu.id} href={`/${userId}/education/${edu.id}`} className="group">
+            <Link key={edu.id} href={linkHref(edu.id)} className="group">
               <Card className="flex items-start p-6 h-full group-hover:shadow-lg transition-shadow">
                 <div className="mr-4">
                   <div className="bg-primary text-primary-foreground rounded-full h-12 w-12 flex items-center justify-center">

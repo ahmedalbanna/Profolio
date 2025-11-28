@@ -5,7 +5,7 @@ import { doc, getFirestore, collection, updateDoc, increment } from 'firebase/fi
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ExternalLink, Eye, Film, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
