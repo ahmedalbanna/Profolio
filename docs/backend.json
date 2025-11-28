@@ -269,6 +269,10 @@
           "type": "string",
           "description": "Unique identifier for the Tag entity."
         },
+        "userProfileId": {
+          "type": "string",
+          "description": "Reference to UserProfile. (Relationship: UserProfile 1:N Tag)"
+        },
         "name": {
           "type": "string",
           "description": "The name of the tag."
@@ -276,6 +280,7 @@
       },
       "required": [
         "id",
+        "userProfileId",
         "name"
       ]
     },
@@ -454,14 +459,18 @@
         }
       },
       {
-        "path": "/tags/{tagId}",
+        "path": "/users/{userId}/tags/{tagId}",
         "definition": {
           "entityName": "Tag",
           "schema": {
             "$ref": "#/backend/entities/Tag"
           },
-          "description": "Stores tags that can be associated with projects. Tags are global and not user-specific.",
+          "description": "Stores tags that can be associated with projects. Tags are specific to each user.",
           "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
             {
               "name": "tagId",
               "description": "The unique identifier for the tag."
@@ -506,6 +515,6 @@
         }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the Profolio application, focusing on user profiles, experience, education, skills, projects, and tags. The primary principle is Authorization Independence, achieved by avoiding hierarchical authorization dependencies.  Each user's data is stored under their respective user ID, ensuring clear ownership. The structure supports QAPs by segregating data based on ownership, allowing secure list operations within a user's profile. Specifically, Experience, Education, Skill, Project, and Certificate collections are subcollections of `/users/{userId}`, so read operations on those collections are implicitly scoped to the user who owns the data. ContactFormSubmissions are stored in a separate collection, requiring specific security rules to control write access, and this keeps that separate from the data owned by users."
+    "reasoning": "The Firestore data structure is designed to support the Profolio application, focusing on user profiles, experience, education, skills, projects, and tags. The primary principle is Authorization Independence, achieved by avoiding hierarchical authorization dependencies.  Each user's data is stored under their respective user ID, ensuring clear ownership. The structure supports QAPs by segregating data based on ownership, allowing secure list operations within a user's profile. Specifically, Experience, Education, Skill, Project, Certificate, and Tag collections are subcollections of `/users/{userId}`, so read operations on those collections are implicitly scoped to the user who owns the data. ContactFormSubmissions are stored in a separate collection, requiring specific security rules to control write access, and this keeps that separate from the data owned by users."
   }
 }

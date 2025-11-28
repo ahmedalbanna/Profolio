@@ -24,7 +24,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, setDocumentNonBlocking } from "@/firebase";
+import { useUser, useFirestore, setDocumentNonBlocking } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { useEffect } from "react";
 
@@ -40,6 +40,7 @@ interface TagFormProps {
 
 export function TagForm({ isOpen, onClose, tag }: TagFormProps) {
   const { toast } = useToast();
+  const { user } = useUser();
   const firestore = useFirestore();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,17 +62,18 @@ export function TagForm({ isOpen, onClose, tag }: TagFormProps) {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!firestore) {
-        toast({ variant: "destructive", title: "Error", description: "Database connection error." });
+    if (!user || !firestore) {
+        toast({ variant: "destructive", title: "Error", description: "Authentication error." });
         return;
     }
 
     const tagId = tag?.id || uuidv4();
-    const docRef = doc(firestore, `tags/${tagId}`);
+    const docRef = doc(firestore, `users/${user.uid}/tags/${tagId}`);
     
     const dataToSave = {
         ...values,
         id: tagId,
+        userProfileId: user.uid,
     };
 
     setDocumentNonBlocking(docRef, dataToSave, { merge: true });

@@ -1,5 +1,5 @@
 'use client';
-import { useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
 import { collection, doc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function TagsPage() {
+    const { user } = useUser();
     const firestore = useFirestore();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedTag, setSelectedTag] = useState(null);
@@ -26,9 +27,9 @@ export default function TagsPage() {
     const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
     const tagsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, `tags`), orderBy('name'));
-    }, [firestore]);
+        if (!user || !firestore) return null;
+        return query(collection(firestore, `users/${user.uid}/tags`), orderBy('name'));
+    }, [user, firestore]);
 
     const { data: tags, isLoading } = useCollection(tagsQuery);
 
@@ -48,8 +49,8 @@ export default function TagsPage() {
     };
 
     const handleDelete = async () => {
-        if (!firestore || !itemToDelete) return;
-        await deleteDoc(doc(firestore, `tags/${itemToDelete}`));
+        if (!user || !firestore || !itemToDelete) return;
+        await deleteDoc(doc(firestore, `users/${user.uid}/tags/${itemToDelete}`));
         setIsAlertOpen(false);
         setItemToDelete(null);
     };

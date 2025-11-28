@@ -26,9 +26,9 @@ export function ProjectsSection() {
     }, [firestore, userId]);
 
     const tagsQuery = useMemoFirebase(() => {
-        if(!firestore) return null;
-        return collection(firestore, 'tags');
-    }, [firestore]);
+        if(!firestore || !userId) return null;
+        return collection(firestore, `users/${userId}/tags`);
+    }, [firestore, userId]);
 
     const { data: projects, isLoading: isLoadingProjects } = useCollection<Project>(projectsQuery);
     const { data: allTags, isLoading: isLoadingTags } = useCollection<Tag>(tagsQuery);

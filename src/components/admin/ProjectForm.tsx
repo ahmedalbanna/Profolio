@@ -64,7 +64,10 @@ export function ProjectForm({ isOpen, onClose, project }: ProjectFormProps) {
 
   const [openTagSelector, setOpenTagSelector] = useState(false);
 
-  const tagsQuery = useMemoFirebase(() => firestore ? collection(firestore, 'tags') : null, [firestore]);
+  const tagsQuery = useMemoFirebase(() => {
+    if (!user || !firestore) return null;
+    return collection(firestore, `users/${user.uid}/tags`);
+  }, [user, firestore]);
   const { data: allTags } = useCollection(tagsQuery);
 
   const form = useForm<z.infer<typeof formSchema>>({

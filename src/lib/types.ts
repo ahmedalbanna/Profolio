@@ -46,6 +46,7 @@ export interface Project {
 
 export interface Tag {
     id: string;
+    userProfileId: string;
     name: string;
 }
 

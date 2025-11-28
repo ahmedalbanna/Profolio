@@ -169,18 +169,18 @@ service cloud.firestore {
     }
 
     /**
-     * @description Global tags for projects. Publicly readable by all users. This collection is managed administratively and is read-only for clients.
-     * @path /tags/{tagId}
-     * @allow (get, list) Any user, signed in or not, can read tags.
-     * @deny (create, update, delete) All write operations from clients are denied.
-     * @principle Secures global lookup data by making it read-only for clients.
+     * @description User-specific tags for projects. Readable by all, but writable only by the owner.
+     * @path /users/{userId}/tags/{tagId}
+     * @allow (get, list) Any user can read tags for a specific user's portfolio.
+     * @allow (create, update, delete) Only the owner of the portfolio can manage their own tags.
+     * @principle Ensures tags are user-owned while remaining publicly readable for project filtering.
      */
-    match /tags/{tagId} {
+    match /users/{userId}/tags/{tagId} {
       allow get: if true;
       allow list: if true;
-      allow create: if true;
-      allow update: if false;
-      allow delete: if false;
+      allow create: if isCreatingOwnData(userId, 'userProfileId');
+      allow update: if isExistingOwner(userId) && isOwnerFieldImmutable('userProfileId');
+      allow delete: if isExistingOwner(userId);
     }
 
     /**

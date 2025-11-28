@@ -24,9 +24,9 @@ export default function ProjectDetailsPage({ params }: { params: { userId: strin
     }, [firestore, userId, id]);
     
     const tagsQuery = useMemoFirebase(() => {
-        if(!firestore) return null;
-        return collection(firestore, 'tags');
-    }, [firestore]);
+        if(!firestore || !userId) return null;
+        return collection(firestore, `users/${userId}/tags`);
+    }, [firestore, userId]);
 
     const { data: project, isLoading: isLoadingProject } = useDoc<Project>(projectRef);
     const { data: allTags, isLoading: isLoadingTags } = useCollection<Tag>(tagsQuery);
