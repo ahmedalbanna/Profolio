@@ -63,12 +63,13 @@ service cloud.firestore {
     }
     
     /**
-     * @description Analytics data. Anyone can write, but no one can read.
-     * This allows for basic, anonymous analytics tracking without exposing data.
+     * @description Analytics data. Anyone can write, but only authenticated users can read.
+     * This allows for anonymous analytics tracking while securing the data for the admin.
      */
     match /visits/{visitId} {
       allow create: if true;
-      allow read, update, delete: if false;
+      allow read: if isSignedIn();
+      allow update, delete: if false;
     }
 
     /**
