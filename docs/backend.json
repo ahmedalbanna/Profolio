@@ -14,6 +14,10 @@
           "type": "string",
           "description": "The user's full name."
         },
+        "professionalTitle": {
+            "type": "string",
+            "description": "The user's professional title, e.g., 'Senior Software Engineer'."
+        },
         "email": {
           "type": "string",
           "description": "The user's email address.",
@@ -38,7 +42,8 @@
         "id",
         "fullName",
         "email",
-        "bio"
+        "bio",
+        "professionalTitle"
       ]
     },
     "Experience": {
