@@ -68,5 +68,3 @@ export interface Certificate {
   credentialUrl?: string;
   imageUrl?: string;
 }
-
-    

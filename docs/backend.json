@@ -509,5 +509,3 @@
     "reasoning": "The Firestore data structure is designed to support the Profolio application, focusing on user profiles, experience, education, skills, projects, and tags. The primary principle is Authorization Independence, achieved by avoiding hierarchical authorization dependencies.  Each user's data is stored under their respective user ID, ensuring clear ownership. The structure supports QAPs by segregating data based on ownership, allowing secure list operations within a user's profile. Specifically, Experience, Education, Skill, Project, and Certificate collections are subcollections of `/users/{userId}`, so read operations on those collections are implicitly scoped to the user who owns the data. ContactFormSubmissions are stored in a separate collection, requiring specific security rules to control write access, and this keeps that separate from the data owned by users."
   }
 }
-
-    

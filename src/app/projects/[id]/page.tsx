@@ -14,13 +14,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useEffect } from 'react';
 
+// Define a default user ID for the public-facing portfolio.
+const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
     const firestore = useFirestore();
     const { id } = params;
     
-    // Hardcoding the user ID for the public portfolio.
-    const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
-
     const projectRef = useMemoFirebase(() => {
         if (!firestore || !id) return null;
         return doc(firestore, `users/${PORTFOLIO_USER_ID}/projects`, id);
@@ -120,7 +120,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
     }
 
     const gallery = [
-        { url: project.imageUrl, type: 'image' },
+        { url: project.imageUrl, type: 'image' as const },
         ...(project.gallery || [])
     ];
 
