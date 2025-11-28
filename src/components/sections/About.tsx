@@ -2,16 +2,17 @@
 import { useDoc, useMemoFirebase } from "@/firebase";
 import { doc, getFirestore } from "firebase/firestore";
 import { Skeleton } from "../ui/skeleton";
-
-// Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+import { useParams } from 'next/navigation';
 
 export function AboutSection() {
     const firestore = getFirestore();
+    const params = useParams();
+    const userId = params.userId as string;
+
     const userProfileRef = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return doc(firestore, `users/${PORTFOLIO_USER_ID}`);
-    }, [firestore]);
+        if (!firestore || !userId) return null;
+        return doc(firestore, `users/${userId}`);
+    }, [firestore, userId]);
 
     const { data: userProfile, isLoading } = useDoc(userProfileRef);
 

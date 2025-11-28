@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, UserCircle, LayoutDashboard } from "lucide-react";
 import React from "react";
 import { useUser } from "@/firebase";
+import { useParams } from 'next/navigation';
 
 const navLinks = [
   { href: "#about", label: "About" },
@@ -18,6 +19,8 @@ const navLinks = [
 export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const { user } = useUser();
+  const params = useParams();
+  const userId = params.userId as string;
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +32,8 @@ export function Header() {
     };
   }, []);
 
+  const portfolioHomeLink = userId ? `/${userId}` : '/';
+
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
@@ -36,7 +41,7 @@ export function Header() {
       }`}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href={portfolioHomeLink} className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">Profolio</span>
         </Link>
         <nav className="hidden items-center gap-6 md:flex">
@@ -70,7 +75,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right">
               <div className="grid gap-4 py-6">
-                <Link href="/" className="flex items-center gap-2 px-4">
+                <Link href={portfolioHomeLink} className="flex items-center gap-2 px-4">
                   <span className="text-xl font-bold text-primary">Profolio</span>
                 </Link>
                 <nav className="grid gap-2 px-4">
@@ -92,5 +97,3 @@ export function Header() {
     </header>
   );
 }
-
-    

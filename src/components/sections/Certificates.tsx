@@ -2,24 +2,24 @@
 import { Card, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useCollection, useMemoFirebase } from "@/firebase";
 import { collection, getFirestore, query, orderBy } from "firebase/firestore";
-import { Award } from "lucide-react";
 import type { Certificate } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import Image from "next/image";
-
-// Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+import { useParams } from 'next/navigation';
 
 export function CertificatesSection() {
     const firestore = getFirestore();
+    const params = useParams();
+    const userId = params.userId as string;
+
     const certificatesQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !userId) return null;
         return query(
-            collection(firestore, `users/${PORTFOLIO_USER_ID}/certificates`),
+            collection(firestore, `users/${userId}/certificates`),
             orderBy('issueDate', 'desc')
         );
-    }, [firestore]);
+    }, [firestore, userId]);
 
     const { data: certificates, isLoading } = useCollection<Certificate>(certificatesQuery);
 
@@ -49,7 +49,7 @@ export function CertificatesSection() {
                </Card>
           ))}
           {certificates?.map((cert) => (
-            <Link key={cert.id} href={`/certificates/${cert.id}`} className="group">
+            <Link key={cert.id} href={`/${userId}/certificates/${cert.id}`} className="group">
               <Card className="flex flex-col h-full overflow-hidden group-hover:shadow-lg transition-shadow">
                 {cert.imageUrl && (
                     <div className="relative h-48 w-full">
@@ -74,5 +74,3 @@ export function CertificatesSection() {
     </section>
   );
 }
-
-    

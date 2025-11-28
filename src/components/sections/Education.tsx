@@ -6,20 +6,20 @@ import { GraduationCap } from "lucide-react";
 import type { Education } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
-
-// Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
-
+import { useParams } from 'next/navigation';
 
 export function EducationSection() {
     const firestore = getFirestore();
+    const params = useParams();
+    const userId = params.userId as string;
+
     const educationsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !userId) return null;
         return query(
-            collection(firestore, `users/${PORTFOLIO_USER_ID}/educations`),
+            collection(firestore, `users/${userId}/educations`),
             orderBy('startDate', 'desc')
         );
-    }, [firestore]);
+    }, [firestore, userId]);
 
     const { data: educations, isLoading } = useCollection<Education>(educationsQuery);
 
@@ -49,7 +49,7 @@ export function EducationSection() {
               </Card>
           ))}
           {educations?.map((edu) => (
-            <Link key={edu.id} href={`/education/${edu.id}`} className="group">
+            <Link key={edu.id} href={`/${userId}/education/${edu.id}`} className="group">
               <Card className="flex items-start p-6 h-full group-hover:shadow-lg transition-shadow">
                 <div className="mr-4">
                   <div className="bg-primary text-primary-foreground rounded-full h-12 w-12 flex items-center justify-center">

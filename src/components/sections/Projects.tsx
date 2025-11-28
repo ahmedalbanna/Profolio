@@ -9,20 +9,19 @@ import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { Input } from "../ui/input";
-import { cn } from "@/lib/utils";
-
-// Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+import { useParams } from 'next/navigation';
 
 export function ProjectsSection() {
     const firestore = getFirestore();
+    const params = useParams();
+    const userId = params.userId as string;
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const projectsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, `users/${PORTFOLIO_USER_ID}/projects`));
-    }, [firestore]);
+        if (!firestore || !userId) return null;
+        return query(collection(firestore, `users/${userId}/projects`));
+    }, [firestore, userId]);
 
     const tagsQuery = useMemoFirebase(() => {
         if(!firestore) return null;
@@ -120,7 +119,7 @@ export function ProjectsSection() {
             ))
            }
           {!isLoading && filteredProjects.map((project) => (
-            <Link key={project.id} href={`/projects/${project.id}`} className="group">
+            <Link key={project.id} href={`/${userId}/projects/${project.id}`} className="group">
                 <Card className="overflow-hidden h-full group-hover:shadow-xl transition-shadow">
                 <CardContent className="p-0">
                     <div className="relative h-60 w-full">

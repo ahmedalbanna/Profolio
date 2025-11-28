@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { LoginForm } from "@/components/admin/LoginForm";
 import { useUser } from "@/firebase";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 export default function AdminLoginPage() {
   const { user, isUserLoading } = useUser();
@@ -51,13 +52,10 @@ export default function AdminLoginPage() {
         <LoginForm />
         <div className="text-center text-sm">
           <Link href="/" className="text-muted-foreground hover:text-primary">
-            &larr; Back to Portfolio
+            &larr; Back to Default Portfolio
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
-// Added Card and Card parts to imports for skeleton loading state
-import { Card, CardContent, CardFooter } from "@/components/ui/card";

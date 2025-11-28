@@ -1,23 +1,23 @@
 'use client';
 import Link from "next/link";
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useDoc, useMemoFirebase } from "@/firebase";
 import { doc, getFirestore } from "firebase/firestore";
-
-// Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "admin";
+import { useParams } from 'next/navigation';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const firestore = getFirestore();
+  const params = useParams();
+  const userId = params.userId as string;
+
   const userProfileRef = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return doc(firestore, `users/${PORTFOLIO_USER_ID}`);
-  }, [firestore]);
+    if (!firestore || !userId) return null;
+    return doc(firestore, `users/${userId}`);
+  }, [firestore, userId]);
 
   const { data: userProfile } = useDoc(userProfileRef);
-
 
   return (
     <footer className="bg-card border-t">
@@ -26,16 +26,20 @@ export function Footer() {
           &copy; {currentYear} {userProfile?.fullName || 'Your Name'}. All rights reserved.
         </p>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={userProfile?.githubUrl || '#'} aria-label="GitHub" target="_blank">
-              <Github className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={userProfile?.linkedinUrl || '#'} aria-label="LinkedIn" target="_blank">
-              <Linkedin className="h-5 w-5" />
-            </Link>
-          </Button>
+          {userProfile?.githubUrl && (
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={userProfile.githubUrl} aria-label="GitHub" target="_blank">
+                <Github className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
+          {userProfile?.linkedinUrl && (
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={userProfile.linkedinUrl} aria-label="LinkedIn" target="_blank">
+                <Linkedin className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </footer>

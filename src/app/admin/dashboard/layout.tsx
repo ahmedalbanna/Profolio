@@ -239,7 +239,7 @@ export default function DashboardLayout({
           <div className="w-full flex-1">
              <h1 className="text-lg font-semibold">Dashboard</h1>
           </div>
-          <Link href="/" className="text-sm text-muted-foreground hover:text-primary mr-4">
+          <Link href={`/${user.uid}`} className="text-sm text-muted-foreground hover:text-primary mr-4">
             <Home className="h-4 w-4 inline-block mr-1" />
             View Site
           </Link>
@@ -270,5 +270,3 @@ export default function DashboardLayout({
     </div>
   );
 }
-
-    

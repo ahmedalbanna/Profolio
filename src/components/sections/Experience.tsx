@@ -6,19 +6,20 @@ import { Briefcase } from "lucide-react";
 import type { Experience } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
-
-// Define a default user ID for the public-facing portfolio.
-const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
+import { useParams } from 'next/navigation';
 
 export function ExperienceSection() {
     const firestore = getFirestore();
+    const params = useParams();
+    const userId = params.userId as string;
+
     const experiencesQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
+        if (!firestore || !userId) return null;
         return query(
-            collection(firestore, `users/${PORTFOLIO_USER_ID}/experiences`),
+            collection(firestore, `users/${userId}/experiences`),
             orderBy('startDate', 'desc')
         );
-    }, [firestore]);
+    }, [firestore, userId]);
 
     const { data: experiences, isLoading } = useCollection<Experience>(experiencesQuery);
   return (
@@ -72,7 +73,7 @@ export function ExperienceSection() {
                   <p className="text-muted-foreground text-sm font-medium">{item.startDate} - {item.endDate || 'Present'}</p>
                 </div>
                 <div className={`w-full sm:w-1/2 ${index % 2 === 0 ? 'sm:pl-8' : 'sm:pr-8'}`}>
-                  <Link href={`/experience/${item.id}`} className="block group">
+                  <Link href={`/${userId}/experience/${item.id}`} className="block group">
                     <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
                         <CardTitle>{item.title}</CardTitle>
