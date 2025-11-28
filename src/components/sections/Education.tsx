@@ -5,6 +5,7 @@ import { collection, getFirestore, query, orderBy } from "firebase/firestore";
 import { GraduationCap } from "lucide-react";
 import type { Education } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
 
 // Define a default user ID for the public-facing portfolio.
 const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
@@ -48,18 +49,20 @@ export function EducationSection() {
               </Card>
           ))}
           {educations?.map((edu) => (
-            <Card key={edu.id} className="flex items-start p-6">
-              <div className="mr-4">
-                <div className="bg-primary text-primary-foreground rounded-full h-12 w-12 flex items-center justify-center">
-                  <GraduationCap className="h-6 w-6" />
+            <Link key={edu.id} href={`/education/${edu.id}`} className="group">
+              <Card className="flex items-start p-6 h-full group-hover:shadow-lg transition-shadow">
+                <div className="mr-4">
+                  <div className="bg-primary text-primary-foreground rounded-full h-12 w-12 flex items-center justify-center">
+                    <GraduationCap className="h-6 w-6" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <CardTitle className="text-lg">{edu.institution}</CardTitle>
-                <CardDescription className="mt-1">{edu.degree}</CardDescription>
-                <p className="text-sm text-muted-foreground mt-2">{edu.startDate} - {edu.endDate || 'Present'}</p>
-              </div>
-            </Card>
+                <div>
+                  <CardTitle className="text-lg">{edu.institution}</CardTitle>
+                  <CardDescription className="mt-1">{edu.degree}</CardDescription>
+                  <p className="text-sm text-muted-foreground mt-2">{edu.startDate} - {edu.endDate || 'Present'}</p>
+                </div>
+              </Card>
+            </Link>
           ))}
             {!isLoading && !educations?.length && (
                 <p className="text-center text-muted-foreground col-span-full">No education history has been added yet.</p>

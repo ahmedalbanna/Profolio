@@ -81,12 +81,14 @@ export const SEED_DATA = {
         degree: "M.S. in Computer Science",
         startDate: "2011",
         endDate: "2013",
+        description: "Focused on distributed systems and machine learning. My thesis project involved developing a novel algorithm for data-intensive parallel processing, which resulted in a publication in a peer-reviewed journal. Served as a teaching assistant for the undergraduate data structures course."
       },
       {
         institution: "Tech Institute",
         degree: "B.S. in Software Engineering",
         startDate: "2007",
         endDate: "2011",
+        description: "Graduated with honors. Completed a senior capstone project that involved building a full-stack web application for a local non-profit organization. Active member of the university's competitive programming club."
       },
     ],
     skills: [
