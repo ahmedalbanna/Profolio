@@ -7,12 +7,17 @@ import { collection, getFirestore, query } from "firebase/firestore";
 import type { Project, Tag } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
 import Link from "next/link";
+import { useState, useMemo } from "react";
+import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
 
 // Define a default user ID for the public-facing portfolio.
 const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
 
 export function ProjectsSection() {
     const firestore = getFirestore();
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const projectsQuery = useMemoFirebase(() => {
         if (!firestore) return null;
@@ -34,6 +39,29 @@ export function ProjectsSection() {
         return tagIds.map(id => allTags.find(t => t.id === id)?.name).filter(Boolean) as string[];
     }
 
+    const handleTagClick = (tagId: string) => {
+        setSelectedTags(prev => 
+            prev.includes(tagId) ? prev.filter(t => t !== tagId) : [...prev, tagId]
+        );
+    }
+    
+    const filteredProjects = useMemo(() => {
+        if (!projects) return [];
+        return projects.filter(project => {
+            const matchesSearch = searchQuery.length > 1 ? 
+                project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                project.description.toLowerCase().includes(searchQuery.toLowerCase())
+                : true;
+            
+            const matchesTags = selectedTags.length > 0 ? 
+                selectedTags.every(tagId => project.tagIds.includes(tagId))
+                : true;
+
+            return matchesSearch && matchesTags;
+        });
+    }, [projects, searchQuery, selectedTags]);
+
+
   return (
     <section id="projects" className="py-24 sm:py-32 bg-card">
       <div className="container mx-auto px-4 md:px-6">
@@ -42,9 +70,36 @@ export function ProjectsSection() {
             Featured Projects
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            A selection of my recent work.
+            A selection of my recent work. Search by title, description, or filter by tags.
           </p>
         </div>
+        
+        <div className="max-w-4xl mx-auto mb-12">
+            <Input 
+                type="text"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="mb-4"
+            />
+             <div className="flex flex-wrap gap-2 justify-center">
+                {isLoadingTags ? (
+                     [...Array(5)].map((_, i) => <Skeleton key={i} className="h-6 w-24 rounded-full" />)
+                ) : (
+                    allTags?.map(tag => (
+                        <Badge 
+                            key={tag.id}
+                            variant={selectedTags.includes(tag.id) ? "default" : "secondary"}
+                            onClick={() => handleTagClick(tag.id)}
+                            className="cursor-pointer transition-colors"
+                        >
+                            {tag.name}
+                        </Badge>
+                    ))
+                )}
+            </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in-0 slide-in-from-bottom-10 duration-1000">
            {isLoading && 
             [...Array(4)].map((_, i) => (
@@ -64,7 +119,7 @@ export function ProjectsSection() {
                  </Card>
             ))
            }
-          {projects?.map((project) => (
+          {!isLoading && filteredProjects.map((project) => (
             <Link key={project.id} href={`/projects/${project.id}`} className="group">
                 <Card className="overflow-hidden h-full group-hover:shadow-xl transition-shadow">
                 <CardContent className="p-0">
@@ -93,6 +148,9 @@ export function ProjectsSection() {
           ))}
            {!isLoading && !projects?.length && (
                 <p className="text-center text-muted-foreground col-span-full">No projects have been added yet.</p>
+            )}
+            {!isLoading && projects?.length > 0 && filteredProjects.length === 0 && (
+                <p className="text-center text-muted-foreground col-span-full">No projects match your search.</p>
             )}
         </div>
       </div>
