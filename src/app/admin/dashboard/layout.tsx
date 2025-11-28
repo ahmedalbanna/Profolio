@@ -11,6 +11,7 @@ import {
   Settings,
   User,
   LogOut,
+  Tags,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +56,7 @@ export default function DashboardLayout({
               <Skeleton className="h-8 w-32" />
             </div>
             <div className="flex-1 p-4 space-y-4">
+              <Skeleton className="h-8 w-full" />
               <Skeleton className="h-8 w-full" />
               <Skeleton className="h-8 w-full" />
               <Skeleton className="h-8 w-full" />
@@ -111,6 +113,13 @@ export default function DashboardLayout({
               >
                 <Lightbulb className="h-4 w-4" />
                 Projects
+              </Link>
+               <Link
+                href="/admin/dashboard/tags"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Tags className="h-4 w-4" />
+                Tags
               </Link>
               <Link
                 href="/admin/dashboard/education"
@@ -172,6 +181,13 @@ export default function DashboardLayout({
                 >
                   <Lightbulb className="h-5 w-5" />
                   Projects
+                </Link>
+                <Link
+                  href="/admin/dashboard/tags"
+                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Tags className="h-5 w-5" />
+                  Tags
                 </Link>
                 <Link
                   href="/admin/dashboard/education"
