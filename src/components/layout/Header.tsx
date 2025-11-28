@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, UserCircle, LayoutDashboard } from "lucide-react";
 import React from "react";
 import { useUser } from "@/firebase";
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 
 const navLinks = [
   { href: "#about", label: "About" },
@@ -20,7 +20,12 @@ export function Header() {
   const [isScrolled, setIsScrolled] = React.useState(false);
   const { user } = useUser();
   const params = useParams();
+  const pathname = usePathname();
+  
   const userId = params.userId as string;
+  const isPortfolioPage = !!userId;
+  const isLandingPage = pathname === '/';
+
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -32,7 +37,7 @@ export function Header() {
     };
   }, []);
 
-  const portfolioHomeLink = userId ? `/${userId}` : '/';
+  const portfolioHomeLink = isPortfolioPage ? `/${userId}` : '/';
 
   return (
     <header
@@ -41,20 +46,24 @@ export function Header() {
       }`}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
-        <Link href={portfolioHomeLink} className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-primary">Profolio</span>
         </Link>
-        <nav className="hidden items-center gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        
+        {isPortfolioPage && (
+          <nav className="hidden items-center gap-6 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href={user ? "/admin/dashboard" : "/admin"}>
@@ -66,32 +75,35 @@ export function Header() {
               {user ? "Dashboard" : "Admin Panel"}
             </Link>
           </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <div className="grid gap-4 py-6">
-                <Link href={portfolioHomeLink} className="flex items-center gap-2 px-4">
-                  <span className="text-xl font-bold text-primary">Profolio</span>
-                </Link>
-                <nav className="grid gap-2 px-4">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className="flex items-center py-2 text-lg font-medium"
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
-            </SheetContent>
-          </Sheet>
+
+          {isPortfolioPage && (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="md:hidden">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right">
+                <div className="grid gap-4 py-6">
+                  <Link href={portfolioHomeLink} className="flex items-center gap-2 px-4">
+                    <span className="text-xl font-bold text-primary">Profolio</span>
+                  </Link>
+                  <nav className="grid gap-2 px-4">
+                    {navLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="flex items-center py-2 text-lg font-medium"
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          )}
         </div>
       </div>
     </header>
