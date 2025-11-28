@@ -1,6 +1,6 @@
 'use client';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
-import { collection, doc, deleteDoc } from "firebase/firestore";
+import { collection, doc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export default function ExperiencePage() {
 
     const experiencesQuery = useMemoFirebase(() => {
         if (!user || !firestore) return null;
-        return collection(firestore, `users/${user.uid}/experiences`);
+        return query(collection(firestore, `users/${user.uid}/experiences`), orderBy('startDate', 'desc'));
     }, [user, firestore]);
 
     const { data: experiences, isLoading } = useCollection(experiencesQuery);
