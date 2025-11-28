@@ -5,6 +5,7 @@ import { collection, getFirestore, query, orderBy } from "firebase/firestore";
 import { Code, Database, Cloud, Cpu, Server, Puzzle } from "lucide-react";
 import type { Skill } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
 
 // Define a default user ID for the public-facing portfolio.
 const PORTFOLIO_USER_ID = "UmsuxfmYVFgcVeaDwGJ7NvKoF662";
@@ -53,12 +54,14 @@ export function SkillsSection() {
             {skills?.map((skill) => {
                 const Icon = iconMap[skill.name] || iconMap.Default;
                 return (
-                    <Card key={skill.id} className="flex flex-col items-center justify-center p-6 text-center hover:shadow-lg transition-shadow">
-                    <CardContent className="p-0 flex flex-col items-center">
-                        <Icon className="h-12 w-12 text-primary mb-4" />
-                        <p className="font-semibold">{skill.name}</p>
-                    </CardContent>
-                    </Card>
+                    <Link key={skill.id} href={`/skills/${skill.id}`} className="group">
+                        <Card className="flex flex-col items-center justify-center p-6 text-center h-full hover:shadow-lg transition-shadow">
+                        <CardContent className="p-0 flex flex-col items-center">
+                            <Icon className="h-12 w-12 text-primary mb-4 transition-transform group-hover:scale-110" />
+                            <p className="font-semibold">{skill.name}</p>
+                        </CardContent>
+                        </Card>
+                    </Link>
                 );
             })}
              {!isLoading && !skills?.length && (

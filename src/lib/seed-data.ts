@@ -90,11 +90,35 @@ export const SEED_DATA = {
       },
     ],
     skills: [
-        { name: "Frontend", level: 5 },
-        { name: "Backend", level: 5 },
-        { name: "Databases", level: 4 },
-        { name: "DevOps", level: 4 },
-        { name: "System Design", level: 4 },
-        { name: "Machine Learning", level: 3 },
+        { 
+            name: "Frontend",
+            level: 5,
+            description: "Expert in building responsive and performant user interfaces using modern frameworks like React and Next.js. Proficient in TypeScript, Tailwind CSS, and state management libraries."
+        },
+        { 
+            name: "Backend",
+            level: 5,
+            description: "Skilled in developing robust server-side applications and APIs using Node.js. Experienced with both RESTful and GraphQL architectures, and proficient in microservices design patterns."
+        },
+        { 
+            name: "Databases",
+            level: 4,
+            description: "Proficient with both SQL and NoSQL databases, including PostgreSQL and Firestore. Experienced in data modeling, query optimization, and ensuring data integrity."
+        },
+        { 
+            name: "DevOps",
+            level: 4,
+            description: "Experienced in setting up and managing CI/CD pipelines, containerization with Docker, and deploying applications to cloud platforms like Google Cloud and Vercel."
+        },
+        { 
+            name: "System Design",
+            level: 4,
+            description: "Capable of designing scalable and resilient distributed systems. Knowledgeable in architectural patterns, load balancing, caching strategies, and message queues."
+        },
+        { 
+            name: "Machine Learning",
+            level: 3,
+            description: "Familiar with the fundamentals of machine learning, including model training and evaluation using frameworks like TensorFlow. Experience in deploying models as part of a larger application."
+        },
     ]
 };

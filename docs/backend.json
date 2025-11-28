@@ -153,6 +153,10 @@
         "level": {
           "type": "number",
           "description": "The proficiency level of the skill (e.g., 1-5)."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the user's proficiency and experience with the skill."
         }
       },
       "required": [

@@ -5,6 +5,7 @@ export interface Skill {
   userProfileId: string;
   name: string;
   level: number;
+  description?: string;
   icon?: LucideIcon; // Icon can be optional now
 }
 
