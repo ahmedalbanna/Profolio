@@ -25,3 +25,8 @@ export interface Project {
   imageUrl: string;
   imageHint: string;
 }
+
+export interface Tag {
+    id: string;
+    name: string;
+}
