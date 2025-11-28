@@ -19,19 +19,24 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useAuth } from "@/firebase";
-import { initiateEmailSignIn } from "@/firebase/non-blocking-login";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { useState } from "react";
 import { FirebaseError } from "firebase/app";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
-  password: z.string().min(1, "Password is required."),
+  password: z.string().min(6, "Password must be at least 6 characters."),
 });
 
 export function LoginForm() {
-  const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>(
+    undefined
+  );
   const auth = useAuth();
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,13 +46,35 @@ export function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setErrorMessage(undefined);
     try {
-      initiateEmailSignIn(auth, values.email, values.password);
-    } catch (error) {
-       if (error instanceof FirebaseError) {
-        setErrorMessage(error.message);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+    } catch (signInError) {
+      if (
+        signInError instanceof FirebaseError &&
+        signInError.code === "auth/user-not-found"
+      ) {
+        try {
+          await createUserWithEmailAndPassword(
+            auth,
+            values.email,
+            values.password
+          );
+        } catch (signUpError) {
+          if (signUpError instanceof FirebaseError) {
+            setErrorMessage(signUpError.message);
+          } else {
+            setErrorMessage("An unexpected error occurred during sign-up.");
+          }
+        }
+      } else if (signInError instanceof FirebaseError) {
+        if (signInError.code === 'auth/invalid-credential') {
+             setErrorMessage("Incorrect password. Please try again.");
+        } else {
+            setErrorMessage(signInError.message);
+        }
       } else {
-        setErrorMessage("An unexpected error occurred.");
+        setErrorMessage("An unexpected error occurred during sign-in.");
       }
     }
   }
